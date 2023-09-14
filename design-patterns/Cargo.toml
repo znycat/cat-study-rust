@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+  "study",
+  "ffi_err",
+  # "pass-string"
+]
