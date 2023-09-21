@@ -26,10 +26,71 @@ fn main() {
     }
 
     // 连接
+    let cat1 = "zny".to_string();
+    let cat2 = String::from("cat");
+    let mut cat3 = cat1 + &cat2;
+    println!("cat3: {:?}", cat3);
+    cat3 += "123";
+    println!("cat3: {:?}", cat3);
 
     // 更新
+    let s = String::from("foobar");
+    let mut result = s.into_bytes();
+    // 用索引来更新操作
+    (0..result.len()).for_each(|i| {
+        if i % 2 == 0 {
+            result[i] = result[i].to_ascii_uppercase();
+        } else {
+            result[i] = result[i].to_ascii_lowercase();
+        }
+    });
+    println!("result: {:?}", result,);
+    println!(
+        "result_String: {:?}",
+        String::from_utf8(result).unwrap_or("def".to_string())
+    );
+
+    let s = String::from("foobar");
+    // 按照字符迭代来处理
+    let s: String = s
+        .chars()
+        .enumerate()
+        .map(|(i, c)| {
+            if i % 2 == 0 {
+                c.to_ascii_lowercase().to_string()
+            } else {
+                c.to_ascii_uppercase().to_string()
+            }
+        })
+        .collect();
+    println!("s: {:?}", s);
 
     // 删除
+
+    let mut s = String::from("foobar");
+    s.remove(3);
+    assert_eq!(s, "fooar");
+
+    let mut s = String::from("foobar");
+    s.truncate(3);
+    assert_eq!(s, "foo");
+
+    let mut s = String::from("foobar");
+    s.clear();
+    assert_eq!(s, "");
+
+    let mut s = String::from("foobbbbar");
+    let beta_offset = s.find('b').unwrap_or(s.len());
+    let t: String = s.drain(..beta_offset).collect();
+    println!("t: {:?}", t);
+    assert_eq!(t, "foo");
+
+    let mut s = String::from("foobar");
+    s.drain(..);
+    assert_eq!(s, "");
+
+
+
 }
 
 #[allow(dead_code)]
