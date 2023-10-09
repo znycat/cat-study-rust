@@ -27,7 +27,7 @@ trait ArrayTrait<E> {
     /// 设置index位置的元素
     /// @param index
     /// @param element
-    fn set(&mut self, index: usize, element: E);
+    fn set(&mut self, index: usize, element: E) -> Option<E>;
 
     /// 在index位置插入element
     /// @param index
@@ -46,6 +46,7 @@ trait ArrayTrait<E> {
 }
 
 #[allow(dead_code)]
+#[derive(Debug)]
 struct ArrayListI32 {
     /// 元素的数量
     size: usize,
@@ -54,7 +55,6 @@ struct ArrayListI32 {
 }
 
 const DEFAULT_CAPACITY: usize = 10;
-
 
 impl Default for ArrayListI32 {
     fn default() -> Self {
@@ -82,31 +82,56 @@ impl ArrayListI32 {
 }
 
 impl ArrayTrait<i32> for ArrayListI32 {
-    fn clear(&mut self) {}
+    fn clear(&mut self) {
+        self.size = 0;
+    }
     fn len(&self) -> usize {
-        0
+        self.size
     }
     fn is_empty(&self) -> bool {
-        true
+        self.size == 0
     }
-    fn contains(&self, _element: i32) -> bool {
-        false
+    fn contains(&self, element: i32) -> bool {
+        self.index_of(element) != None
     }
     fn append(&mut self, _element: i32) {}
-    fn get(&self, _index: usize) -> Option<i32> {
-        None
+    fn get(&self, index: usize) -> Option<i32> {
+        if index >= self.elements.len() {
+            return None;
+        }
+        Option::Some(self.elements[index])
     }
-    fn set(&mut self, _index: usize, _element: i32) {}
+    fn set(&mut self, index: usize, element: i32) -> Option<i32> {
+        if index >= self.elements.len() {
+            return None;
+        }
+        let old = self.elements[index];
+        self.elements[index] = element;
+        Option::Some(old)
+    }
     fn add(&mut self, _index: usize, _element: i32) {}
     fn remove(&mut self, _index: usize) -> Option<i32> {
         None
     }
-    fn index_of(&self, _element: i32) -> Option<usize> {
+    fn index_of(&self, element: i32) -> Option<usize> {
+        let mut res: usize = 0;
+        for i in 0..self.size {
+            if self.elements[i] == element {
+                return Some(res);
+            }
+            res += 1;
+        }
         None
     }
 }
 
 #[test]
 fn test_array() {
-    println!("Hello, world!");
+    let mut list = ArrayListI32::default();
+    list.append(11);
+    list.append(11);
+    list.append(11);
+    list.append(11);
+    list.append(11);
+    println!("list: {:?}", list);
 }
