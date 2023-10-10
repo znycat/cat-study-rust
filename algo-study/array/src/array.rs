@@ -67,7 +67,6 @@ impl Default for ArrayListI32 {
 
 impl ArrayListI32 {
     #[allow(dead_code)]
-    #[allow(dead_code)]
     fn new(capaticy: usize) -> Self {
         Self {
             size: 0,
