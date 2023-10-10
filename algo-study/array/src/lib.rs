@@ -1,5 +1,6 @@
 
 pub mod array;
+pub mod array_generic;
 
 mod study01 {
     #[allow(dead_code)]
