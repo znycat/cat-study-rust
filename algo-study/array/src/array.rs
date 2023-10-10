@@ -67,7 +67,6 @@ impl Default for ArrayListI32 {
 
 impl ArrayListI32 {
     #[allow(dead_code)]
-
     #[allow(dead_code)]
     fn new(capaticy: usize) -> Self {
         Self {
@@ -105,6 +104,8 @@ impl ArrayTrait<i32> for ArrayListI32 {
         self.index_of(element) != None
     }
     fn append(&mut self, element: i32) {
+        self.ensure_capacity(self.size + 1);
+
         self.elements[self.size] = element;
         self.size += 1;
     }
@@ -122,13 +123,39 @@ impl ArrayTrait<i32> for ArrayListI32 {
         self.elements[index] = element;
         Option::Some(old)
     }
+
     fn add(&mut self, index: usize, element: i32) {
-        self.elements[index] = element;
+        if index > self.elements.len() {
+            return;
+        }
+
+        self.ensure_capacity(self.size + 1);
+
         self.size += 1;
+
+        let mut i: usize = self.size;
+        while i > index {
+            self.elements[i] = self.elements[i - 1];
+            i -= 1;
+        }
+
+        self.elements[index] = element;
     }
-    fn remove(&mut self, _index: usize) -> Option<i32> {
-        None
+
+    fn remove(&mut self, index: usize) -> Option<i32> {
+        if index >= self.elements.len() {
+            return None;
+        }
+        let old = self.elements[index];
+        self.size -= 1;
+
+        for i in index..self.size {
+            self.elements[i] = self.elements[i + 1];
+        }
+
+        return Option::Some(old);
     }
+
     fn index_of(&self, element: i32) -> Option<usize> {
         let mut res: usize = 0;
         for i in 0..self.size {
@@ -141,14 +168,42 @@ impl ArrayTrait<i32> for ArrayListI32 {
     }
 }
 
+impl ArrayListI32 {
+    /// 扩容
+    /// @param capacity
+    fn ensure_capacity(&mut self, capacity: usize) {
+        let old_capacity = self.elements.capacity();
+        if old_capacity > capacity {
+            return;
+        }
+        // 右移1 相当于除2
+        let new_capacity = old_capacity + (old_capacity >> 1);
+        let mut new_elements = vec![0; new_capacity];
+        for i in 0..self.size {
+            new_elements[i] = self.elements[i];
+        }
+        self.elements = new_elements;
+    }
+}
+
 #[test]
 fn test_array() {
     let mut list = ArrayListI32::default();
     println!("list: {}", list);
     list.append(11);
-    list.append(11);
-    list.append(11);
-    list.append(11);
-    list.append(11);
+    list.append(21);
+    list.append(31);
+    list.append(41);
+    list.append(51);
+    list.append(61);
+    list.append(71);
+    list.append(71);
+    list.append(71);
+    println!("list: {}", list);
+    list.add(0, 1);
+    println!("list: {}", list);
+    list.add(2, 22);
+    // let a = list.remove(0);
+    // println!("a: {:?}", a);
     println!("list: {}", list);
 }
