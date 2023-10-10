@@ -46,7 +46,6 @@ trait ArrayTrait<E> {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
 struct ArrayListI32 {
     /// 元素的数量
     size: usize,
@@ -58,7 +57,7 @@ const DEFAULT_CAPACITY: usize = 10;
 
 impl Default for ArrayListI32 {
     fn default() -> Self {
-        Self::new_capaticy(DEFAULT_CAPACITY)
+        Self::new(DEFAULT_CAPACITY)
         // Self {
         //     size: 0,
         //     elements: vec![0, DEFAULT_CAPACITY],
@@ -68,16 +67,27 @@ impl Default for ArrayListI32 {
 
 impl ArrayListI32 {
     #[allow(dead_code)]
-    fn new(size: usize, elements: Vec<i32>) -> Self {
-        Self { size, elements }
-    }
 
     #[allow(dead_code)]
-    fn new_capaticy(capaticy: usize) -> Self {
+    fn new(capaticy: usize) -> Self {
         Self {
-            size: capaticy,
-            elements: vec![0, capaticy as i32],
+            size: 0,
+            elements: vec![0; capaticy],
         }
+    }
+}
+
+impl std::fmt::Display for ArrayListI32 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "size={}, [", self.size)?;
+        for i in 0..self.size {
+            let v = self.elements[i];
+            if i != 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", v)?;
+        }
+        write!(f, "]")
     }
 }
 
@@ -94,7 +104,10 @@ impl ArrayTrait<i32> for ArrayListI32 {
     fn contains(&self, element: i32) -> bool {
         self.index_of(element) != None
     }
-    fn append(&mut self, _element: i32) {}
+    fn append(&mut self, element: i32) {
+        self.elements[self.size] = element;
+        self.size += 1;
+    }
     fn get(&self, index: usize) -> Option<i32> {
         if index >= self.elements.len() {
             return None;
@@ -109,7 +122,10 @@ impl ArrayTrait<i32> for ArrayListI32 {
         self.elements[index] = element;
         Option::Some(old)
     }
-    fn add(&mut self, _index: usize, _element: i32) {}
+    fn add(&mut self, index: usize, element: i32) {
+        self.elements[index] = element;
+        self.size += 1;
+    }
     fn remove(&mut self, _index: usize) -> Option<i32> {
         None
     }
@@ -128,10 +144,11 @@ impl ArrayTrait<i32> for ArrayListI32 {
 #[test]
 fn test_array() {
     let mut list = ArrayListI32::default();
+    println!("list: {}", list);
     list.append(11);
     list.append(11);
     list.append(11);
     list.append(11);
     list.append(11);
-    println!("list: {:?}", list);
+    println!("list: {}", list);
 }
