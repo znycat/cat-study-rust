@@ -1,22 +1,24 @@
-pub struct List {
-    head: Link,
+#[derive(Debug)]
+pub struct List<T> {
+    head: Link<T>,
 }
 
-impl List {
+impl<T> List<T> {
     pub fn new() -> Self {
         List { head: Link::None }
     }
 
-    pub fn push(&mut self, elem: i32) {
+    pub fn push(&mut self, elem: T) {
+        // Option 有一个take方法, 可以替代mem::replace
         let new_node = Box::new(Node {
             elem,
-            next: std::mem::replace(&mut self.head, Link::None),
+            next: self.head.take(),
         });
         self.head = Link::Some(new_node);
     }
 
-    pub fn pop(&mut self) -> Option<i32> {
-        match std::mem::replace(&mut self.head, None) {
+    pub fn pop(&mut self) -> Option<T> {
+        match self.head.take() {
             None => None,
             Some(node) => {
                 self.head = node.next;
@@ -26,7 +28,7 @@ impl List {
     }
 }
 
-impl Drop for List {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         // 重写drop
         // 系统的drop 会递归的调用drop,
@@ -35,20 +37,21 @@ impl Drop for List {
         //
         // 为了防止这种情况，我们需要重写drop
         // 直接拿到当前的head 同时replace会将他替换为None
-        let mut cur_link = std::mem::replace(&mut self.head, None);
+        let mut cur_link = self.head.take();
         // 遍历next, 将每一个元素都替换为None
         while let Some(mut boxed_node) = cur_link {
-            cur_link = std::mem::replace(&mut boxed_node.next, None);
+            cur_link = boxed_node.next.take();
             // println!("cur_link {:?}", boxed_node.elem);
         }
     }
 }
 
-type Link = Option<Box<Node>>;
+type Link<T> = Option<Box<Node<T>>>;
 
-struct Node {
-    elem: i32,
-    next: Link,
+#[derive(Debug)]
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
 #[cfg(test)]
@@ -86,5 +89,12 @@ mod test {
             list.push(i);
         }
         // drop(list);
+    }
+
+    #[test]
+    fn test_01() {
+        let mut list = List::new();
+        list.push(3);
+        println!("list: {:?}", list);
     }
 }
