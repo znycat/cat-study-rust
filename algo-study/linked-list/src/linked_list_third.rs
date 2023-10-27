@@ -23,6 +23,20 @@ pub struct List<T> {
     head: Link<T>,
 }
 
+impl<T> Drop for List<T> {
+    fn drop(&mut self) {
+        let mut head = self.head.take();
+        while let Some(node) = head {
+            // Rc::Try_unwrap ，该方法会判断当前的 Rc 是否只有一个强引用，若是，则返回 Rc 持有的值，否则返回一个错误
+            if let Ok(mut node) = Rc::try_unwrap(node) {
+                head = node.next.take();
+            } else {
+                break;
+            }
+        }
+    }
+}
+
 impl<T> List<T> {
     pub fn new() -> Self {
         List { head: None }
